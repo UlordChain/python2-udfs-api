@@ -21,4 +21,4 @@
         print upload_res
  
  # tips
-   you can Obtain the key and the uosAccount from the Ulord foundation 
+   You can obtain the key and the uosAccount from the Ulord foundation 
