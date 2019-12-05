@@ -27,7 +27,7 @@ class UdfsDevTools():
     #uosAccount:uos账号
     #filePath:需要上传的文件路径
     #udfsCallbackUrl:回调url,udfs上传完毕后回调该url,将返回（文件id，哈希值，文件size），该参数可为空
-    def getUploadUrl(self,expireSec, secretKey, uosAccount, filePath, udfsCallbackUrl):
+    def getUploadUrl(self,expireSec, uosAccount,secretKey,  filePath, udfsCallbackUrl):
         fileName = os.path.basename(filePath);
         fileSize = str(os.path.getsize(filePath))
         md5 = self.GetFileMd5(filePath);
@@ -44,10 +44,10 @@ class UdfsDevTools():
             my_sign = hmac.new(secretKey, encodedPolicy, sha1).digest()
             encodeSign = base64.urlsafe_b64encode(my_sign)
         except Exception as ex:
-            raise Exception("构建下载链接出错" + ex.toString())
+            raise Exception("构建上传链接出错" + ex.toString())
         token = uosAccount + ":" + encodeSign + ":" + encodedPolicy
-        downloadUrl = 'http://api.udfs.one:15001/api/v0/add' + "?token=" + token
-        return downloadUrl
+        uploadloadUrl = 'http://api.udfs.one:15001/api/v0/add' + "?token=" + token
+        return uploadloadUrl
 
     #uosAccount:uos账号
     #secretKey:秘钥,用于udfs访问,从udfs官方获取
@@ -65,6 +65,21 @@ class UdfsDevTools():
         except Exception as ex:
             raise Exception("构建下载链接出错" + ex.toString())
         token = uosAccount + ":" + encodeSign + ":" + encodedPolicy
-        downloadUrl = 'http://api.udfs.one:15001/api/v0/get/' + hashvalue + "?token=" + token
+        downloadUrl = 'http://api.udfs.one:15001/api/v0/cat/' + hashvalue + "?token=" + token
         return downloadUrl;
+
+    def deletefile(self,uosAccount,secretKey,expireSec,hashvalue):
+        expireTime = int(time.time())
+        expireTime += expireSec;
+        json = "{\"ver\":0,\"expired\": "+str(expireTime)+",\"ext\":{}}"
+        try :
+            textByte = bytes(json)
+            encodedPolicy = base64.urlsafe_b64encode(textByte)
+            my_sign = hmac.new(secretKey, encodedPolicy, sha1).digest()
+            encodeSign = base64.urlsafe_b64encode(my_sign)
+        except Exception as ex:
+            raise Exception("构建下载链接出错" + ex.toString())
+        token = uosAccount + ":" + encodeSign + ":" + encodedPolicy
+        deleteUrl = 'http://api.udfs.one:15001/api/v0/delete/' + hashvalue + "?token=" + token
+        return deleteUrl;
 
